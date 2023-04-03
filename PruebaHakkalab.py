@@ -5,7 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-import datetime
 
 #automatizar el clic en un elemento web
 def click_element_by_xpath(xpath):
@@ -18,7 +17,7 @@ def send_keys(xpath,texto):
     element.click()
     element.send_keys(texto)
 
-#automatizar la interacción con la parte del rango dentro de la parte "input" de la pagina
+#automatizar la interacción con un elemento de la página web 
 def uso_de_rango(xpath, range):
     #elemento = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath))): busca el elemento web que corresponde al XPath proporcionado y espera hasta que esté presente 
         #driver: es el controlador de Selenium que se utiliza para interactuar con el navegador web
@@ -34,33 +33,6 @@ def uso_de_rango(xpath, range):
     acciones.click_and_hold(elemento).move_by_offset(range, 0).release().perform()
     time.sleep (5)
 
-#FECHA mm/yyyy
-def ingresar_fecha(driver, fecha): 
-    calendario = driver.find_element(By.XPATH, '//input[@id="month"]')
-    calendario.click()
-    calendario.send_keys(fecha.strftime('%B')) # ingresa el nombre del mes
-    calendario.send_keys(Keys.TAB)
-    calendario.send_keys(fecha.strftime('%Y')) # ingresa el año en formato YYYY
-
-# FECHA mm/dd/yyyy
-def ingresarfecha(driver, fecha):
-    calendario = driver.find_element(By.ID, 'date')
-    calendario.click()
-    calendario.clear()
-    
-    # Separar la fecha en mes, día y año
-    mes, dia, anio = fecha.split('/')
-    
-    # Hacer clic en el mes y en el año en el calendario
-    mes_selector = driver.find_element(By.XPATH, f"//div[@class='calendar']/div[contains(@class, 'months')]/span[contains(text(), '{mes}')]")
-    mes_selector.click()
-    time.sleep(1) # Esperar un segundo para que se actualice el calendario
-    anio_selector = driver.find_element(By.XPATH, f"//div[@class='calendar']/div[contains(@class, 'years')]/span[contains(text(), '{anio}')]")
-    anio_selector.click()
-    time.sleep(1) # Esperar un segundo para que se actualice el calendario
-    
-    # Enviar las teclas con la fecha
-    calendario.send_keys(fecha)
 
 def send_keys_tab(xpath, text):
     elemento = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
@@ -71,61 +43,45 @@ def send_keys_tab(xpath, text):
     calendario.send_keys(texto)
     time.sleep (5)
 
-#VER ESTE DEF PORQUE NO ANDA
-def ingresar_fecha(driver, fecha):
-    calendario = driver.find_element(By.ID, 'month')
-    calendario.click()
-    nombre_mes = fecha.strftime('%B')
-    num_mes = datetime.datetime.strptime(nombre_mes, '%B').strftime('%Y-%m')
-    anio = str(fecha.year)
+def seleccionar_fecha_y_anio(date,value):
+    fecha_input = driver.find_element_by_id('date')
+    fecha_actual = fecha_input.get_attribute('value')
+    dia, mes, anio = fecha_actual.split('-')
+    print("Fecha actual:", fecha_actual)
+    print("Día:", dia)
+    print("Mes:", mes)
+    print("Año:", anio)
 
-    # Enviar el nombre del mes
-    for letra in nombre_mes:
-        calendario.send_keys(letra)
-
-    # Ir al siguiente campo de entrada
-    calendario.send_keys(Keys.TAB)
-
-    # Enviar el año
-    for letra in anio:
-        calendario.send_keys(letra)
-
-#PRIMERA PARTE DE INPUT
-def ingresar_datos(driver, usuario, contrasena, comentario):
-    input_usuario = driver.find_element(By.ID, 'InputUserName')
-    input_usuario.send_keys(usuario)
-    time.sleep(0.5)
-
-    input_contrasena = driver.find_element(By.ID, 'password')
-    input_contrasena.send_keys(contrasena)
-    time.sleep(0.5)
-
-    textarea_comentario = driver.find_element(By.ID, 'exampleFormControlTextarea1')
-    textarea_comentario.send_keys(comentario)
-    time.sleep(0.5)
-
-#INGRESAMOS A LA PAGINA
 driver = webdriver.Chrome('./driver/chromedriver.exe')
 driver.get('https://hakalab.com/hakatools')
 time.sleep (0.5)
 click_element_by_xpath('//div[@id="cardGoElemets"]')
 time.sleep (0.5)
-#INSERTAMOS EL NOMBRE, CONTRASEÑA Y TEXTO ok
-usuario = 'nara finos'
-contrasena = 'lamotomami2023'
-comentario = 'si llegaste hasta aquí ya estoy saltando de alegría'
-ingresar_datos(driver, usuario, contrasena, comentario)
+send_keys('//input[@id="InputUserName"]', "nara finos")
 time.sleep (0.5)
-#RANGO ok
+time.sleep (0.5)
+send_keys('//input[@id="password"]', "lamotomami2023")
+time.sleep (0.5)
+send_keys('//textarea[@id="exampleFormControlTextarea1"]', "si llegaste hasta aquí ya estoy saltando de alegría")
+time.sleep (0.5)
 uso_de_rango('//input[@id="customRange1"]', 50)
-# INGRESAMOS FECHA CON DD/MM/YYY
-fecha = '01/10/2009'
-ingresarfecha(driver, fecha)
+calendario = driver.find_element(By.XPATH,'//input[@id="date"]')
+calendario.click()
+calendario.send_keys("10/01/2009")
+time.sleep (0.5)
+calendario = driver.find_element(By.XPATH,'//input[@id="month"]')
+calendario.click()
+calendario.send_keys("july")
+calendario.send_keys(Keys.TAB)
+calendario.send_keys("2023")
 
 ##hay un problema 
-#fecha = datetime.date(1992, 1, 1)
-#ingresar_fecha(driver, fecha)
-#time.sleep (5)
+calendario = driver.find_element(By.XPATH,'//input[@id="month"]')
+calendario.click()
+calendario.send_keys("july")
+calendario.send_keys(Keys.TAB)
+calendario.send_keys("2023")
+time.sleep (2)
 
 #cal_semana = driver.find_element(By.XPATH,'//input[@id="datetime-local"]')
 #cal_semana.click()
